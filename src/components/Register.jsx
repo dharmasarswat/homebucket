@@ -2,13 +2,26 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/userContext";
+import { useMutation } from "@apollo/client";
+import { REGISTER } from "../ApolloClient/mutations"
 
 export default function Register() {
   const navigate = useNavigate();
   const { user, setUser } = useUser();
-  useEffect(() => {
-    if (!!user) window.location = "/user";
-  }, [user]);
+   const [register, { loading, data, error }] = useMutation(REGISTER);
+
+  useEffect(()=>{
+    if(!loading && !!data?.register){
+      setUser(data?.register?.user);
+    }
+  },[data])
+
+  useEffect(()=>{
+    if(!!user){
+      localStorage.setItem("homebucket", data?.register?.token);
+      navigate("/user");
+    }
+  },[user])
 
   const initialFormState = {
     email: "",
@@ -18,12 +31,9 @@ export default function Register() {
 
   const [formState, setFromState] = useState(initialFormState);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("formState: ", formState);
-    localStorage.setItem("homebucket", formState.email);
-    setUser(formState.email);
-    navigate("/user");
+    await register({ variables: formState})
   };
 
   const handleChange = ({ target: { name, value } }) =>
@@ -74,6 +84,7 @@ export default function Register() {
             </Form.Group>
           </Col>
         </Row>
+        {!!error && <p className="text-danger mb-4">{error.message}</p>}
         <Row className="mt-4">
           <Col>
             <Button

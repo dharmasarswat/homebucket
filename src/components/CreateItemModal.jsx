@@ -99,9 +99,7 @@ export default function CreateItemModal({ roomId }) {
                     value={formState.category}
                   >
                     <option value="">select one categorys</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    {["Accessories", "Appeliences", "Books", "Cosmetics", "Clothes", "Shoes", "Jelewely"].map(item => (<option value={item} key={item}>{item}</option>))}
                   </Form.Select>
                 </Form.Group>
               </Col>

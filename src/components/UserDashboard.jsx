@@ -1,20 +1,32 @@
-import React from "react";
+import React, {useEffect} from "react";
+import {useLazyQuery} from "@apollo/client"
+import {useNavigate} from "react-router-dom"
 import CreateRoomModal from "./CreateRoomModal";
 import Room from "./Room";
-
-const rooms = [
-  { name: "New Room", description: "This room is newly created " },
-  { name: "New Room", description: "This room is newly created " },
-  { name: "New Room", description: "This room is newly created " },
-];
+import { ROOMSFORUSER } from "../ApolloClient/query"
+import {useUser} from "../context/userContext"
 
 export default function UserDashboard() {
+  const {user, setUser} = useUser()
+  const navigate = useNavigate()
+  const [roomsForUser, { loading, data, error }] = useLazyQuery(ROOMSFORUSER)
+
+  useEffect(()=>{
+    if(!loading && !user) navigate("/")
+    if(!!user) roomsForUser({variables: {userId: user.id}})
+  },[user, loading])
+
+  useEffect(()=>{
+    if(data?.roomsForUser){
+      setUser(user => ({...user, rooms: [...(user?.rooms ?? []), ...(data.roomsForUser ?? [])]}))
+    }
+  },[data])
   return (
     <>
       <CreateRoomModal />
-      {rooms.map((room) => (
+      {!loading && !error&& !!data?.roomsForUser?.length ? user?.rooms?.map((room) => (
         <Room key={room.id} room={room} />
-      ))}
+      )) : <h5 className="text-center mt-4">No rooms added.</h5>}
     </>
   );
 }

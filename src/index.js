@@ -5,12 +5,16 @@ import "./index.css"
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { UserProvider } from "./context/userContext";
+import { client } from "./ApolloClient/client"
+import { ApolloProvider } from "@apollo/client";
 
 ReactDOM.render(
   <React.StrictMode>
-    <UserProvider>
-      <App />
-    </UserProvider>
+    <ApolloProvider client={client}>
+      <UserProvider>
+        <App />
+      </UserProvider>
+    </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

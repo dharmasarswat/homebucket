@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/userContext";
+import { useMutation } from "@apollo/client";
+import { LOGIN } from "../ApolloClient/mutations"
 
 export default function Login() {
   const navigate = useNavigate();
   const { user, setUser } = useUser();
-  useEffect(() => {
-    if (!!user) window.location = "/user";
-  }, [user]);
 
   const initialFormState = {
     email: "",
@@ -16,13 +15,24 @@ export default function Login() {
   };
 
   const [formState, setFromState] = useState(initialFormState);
+  const [login, { loading, data, error }] = useMutation(LOGIN);
 
-  const handleLogin = (e) => {
+  useEffect(()=>{
+    if(!loading && !!data?.login){
+      setUser(data?.login?.user);
+    }
+  },[data])
+
+  useEffect(()=>{
+    if(!!user){
+      localStorage.setItem("homebucket", data?.login?.token);
+      navigate("/user");
+    }
+  },[user])
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("formState: ", formState);
-    localStorage.setItem("homebucket", formState.email);
-    setUser(formState.email);
-    navigate("/user");
+    await login({variables: {email: formState.email, password: formState.password}})
   };
 
   const handleChange = ({ target: { type, value } }) =>
@@ -59,6 +69,7 @@ export default function Login() {
             </Form.Group>
           </Col>
         </Row>
+        {!!error && <p className="text-danger mb-4">{error.message}</p>}
         <Row className="mt-4">
           <Col>
             <Button

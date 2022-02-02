@@ -7,7 +7,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { user } = useUser();
   useEffect(() => {
-    if (!!user) window.location = "/user";
+    if (!!user) navigate("/user");
   }, [user]);
   return (
     <Container

@@ -12,6 +12,7 @@ export default function Dashboard() {
     window.location.pathname.split("/")[2] ?? "dashboard"
   );
 
+
   useEffect(() => {
     if (!user) navigate("/");
   }, [user]);
@@ -68,7 +69,7 @@ export default function Dashboard() {
         <Container>
           <Row>
             <Col md={12}>
-              <h3>Welcome {user?.name} User</h3>
+              <h3>Welcome <span className="text-primary">{user?.username}</span></h3>
             </Col>
             <div className="border w-100 mb-4 mt-4" />
             {activeTab === "dashboard" && <UserDashboard />}
