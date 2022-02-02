@@ -5,6 +5,7 @@ import CreateRoomModal from "./CreateRoomModal";
 import Room from "./Room";
 import { ROOMSFORUSER } from "../ApolloClient/query"
 import {useUser} from "../context/userContext"
+import uniqBy from "lodash/uniqBy"
 
 export default function UserDashboard() {
   const {user, setUser} = useUser()
@@ -18,7 +19,7 @@ export default function UserDashboard() {
 
   useEffect(()=>{
     if(data?.roomsForUser){
-      setUser(user => ({...user, rooms: [...(user?.rooms ?? []), ...(data.roomsForUser ?? [])]}))
+      setUser(user => ({...user, rooms: uniqBy([...(user?.rooms ?? []), ...(data.roomsForUser ?? [])], "id")}))
     }
   },[data])
   return (
